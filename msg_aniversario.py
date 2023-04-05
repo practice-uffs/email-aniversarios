@@ -29,7 +29,7 @@ aniversariantes = df.query(f"(Ativo == 'sim') & (Nascimento == '{dia_de_hoje}')"
 # se houverem aniversariantes envia a mensagem, senão imprime mensagem informativa
 if len(aniversariantes) > 0:
     # servidor, porta e tipo de autenticação
-    server = Envelope(from_=sender_email).smtp(
+    server = Envelope(from_=f"{sender_name} <{sender_email}>").smtp(
         host=server_host,
         port=server_port,
         user=sender_email,
