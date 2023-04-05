@@ -1,10 +1,8 @@
 import pandas as pd
 from envelope import Envelope
-
 from dotenv import dotenv_values
-config = dotenv_values(".env")
 
-aniversariantes = 0
+config = dotenv_values(".env")
 
 # trocar SHEET_ID para o arquivo compartilhado no GoogleDocs
 url = f"https://docs.google.com/spreadsheets/d/{config['DATASHEET_ID']}/gviz/tq?tqx=out:csv&sheet={config['DATASHEET_NAME']}"
@@ -25,24 +23,20 @@ dia_de_hoje = pd.to_datetime('today').date().strftime('%d/%m')
 df = pd.read_csv(url)
 df['Nascimento'] = pd.to_datetime(df['Nascimento'], dayfirst=True).dt.strftime('%d/%m')
 
-attachment = 'niver.png'
-with open(attachment, 'rb') as fd:
-    img_data = fd.read()
-
 # realiza uma query no dataframe em busca dos aniversariantes do dia
 aniversariantes = df.query(f"(Ativo == 'sim') & (Nascimento == '{dia_de_hoje}')")
 
 # se houverem aniversariantes envia a mensagem, senão imprime mensagem informativa
 if len(aniversariantes) > 0:
     # servidor, porta e tipo de autenticação
-    server = Envelope(
-            from_=sender_email
-        ).smtp(
-            host=server_host,
-            port=server_port,
-            user=sender_email,
-            password=sender_password,
-            security='starttls')
+    server = Envelope(from_=sender_email).smtp(
+        host=server_host,
+        port=server_port,
+        user=sender_email,
+        password=sender_password,
+        security='starttls'
+    )
+    # para cada linha contendo um aniversariante
     for i, row in aniversariantes.iterrows():
         print(row)
 
@@ -50,7 +44,7 @@ if len(aniversariantes) > 0:
             msg = row['Nome']
         else:
             msg = f"{row['Prefixo']}  {row['Nome']}"
-
+        # monta a mensagem
         html_message = f"""
                 <html>
                 <head></head>
@@ -61,11 +55,11 @@ if len(aniversariantes) > 0:
                 </html>
                 """
         server.attach(
-                path="niver.png",
-                inline=True
-            ).subject("Feliz Aniversário!").message(html_message).to(row['email']).send()
+            path="niver.png", inline=True
+        ).subject("Feliz Aniversário!").message(html_message).to(row['email']).send()
 
-        print(msg + ': ' + row['email'])
+        # informa sobre os emails enviados
+        print(f"{msg}: {row['email']}")
 
     server.smtp_quit()
 
