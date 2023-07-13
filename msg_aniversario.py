@@ -75,19 +75,19 @@ if len(aniversariantes) > 0:
         logger.info(f"Enviando email para {row['email']}...")
 
         # TODO: ver uma forma mais elegante de iniciar o server e não duplicar os endereços
-        # server = Envelope(from_=f"{sender_name} <{sender_email}>").smtp(
-        #     host=server_host,
-        #     port=server_port,
-        #     user=sender_email,
-        #     password=sender_password,
-        #     security='starttls'
-        # )
+        server = Envelope(from_=f"{sender_name} <{sender_email}>").smtp(
+            host=server_host,
+            port=server_port,
+            user=sender_email,
+            password=sender_password,
+            security='starttls'
+        )
 
-        # server.attach(
-        #     path=f"assets/{card_selecionado}", inline=True
-        # ).subject("Feliz Aniversário!").message(html_message).to(row['email']).send()
+        server.attach(
+            path=f"assets/{card_selecionado}", inline=True
+        ).subject("Feliz Aniversário!").message(html_message).to(row['email']).send()
 
-        # server.smtp_quit()
+        server.smtp_quit()
 
         # informa sobre os emails enviados
         logger.info(f"{msg}: {row['email']}")
